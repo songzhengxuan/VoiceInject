@@ -4,6 +4,8 @@ import android.app.Application;
 import android.app.Instrumentation;
 import android.util.Log;
 
+import com.voiceinject.patcher.Patcher;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,6 +16,7 @@ import java.lang.reflect.Method;
 public class MyApplication extends Application {
     private static final String TAG = "MyApplication";
 
+    private Patcher mPatcher;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -38,6 +41,9 @@ public class MyApplication extends Application {
                 e.printStackTrace();
             }
             SoloInstance.initSoloInstance(this, instrumentation);
+
+            Patcher.initInstance(this, instrumentation);
+            Patcher.getsInstance().loadPatch("/sdcard/patch-debug.apk");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
