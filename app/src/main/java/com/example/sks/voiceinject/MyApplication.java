@@ -17,7 +17,7 @@ public class MyApplication extends Application {
         super.onCreate();
         Log.d(TAG, "this app is " + this);
         Patcher.initInstance(this);
-        Patcher.getsInstance().loadPatch("/sdcard/patch-debug.apk");
+        Patcher.getsInstance().loadPatch("/sdcard/patch.apk");
         Patcher.getsInstance().onAppCreate(this);
     }
 }
