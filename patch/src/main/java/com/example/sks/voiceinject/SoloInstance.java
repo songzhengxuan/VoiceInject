@@ -29,6 +29,7 @@ public class SoloInstance {
     private static Context appContext;
     private static SoloInstance sInstance;
     private ScriptEngine mScriptEngine;
+    private IService mVoiceService;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

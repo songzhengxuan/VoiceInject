@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
@@ -47,6 +48,14 @@ public class ServiceProvider extends ContentProvider {
     @Nullable
     @Override
     public Bundle call(String method, String arg, Bundle extras) {
+        if ("getService".equals(method)) {
+            if ("voice".equals(arg)) {
+                IBinder binder = MainControlCenter.getInstance().getService().asBinder();
+                Bundle result = new Bundle();
+                result.putBinder("binder", binder);
+                return result;
+            }
+        }
         return super.call(method, arg, extras);
     }
 }
