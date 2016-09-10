@@ -20,8 +20,7 @@
             android:authorities="com.example.sks.voiceinject.provider"
             android:name="com.example.sks.voiceservice.ServiceProvider">
         </provider>
-        <service android:name=".MainService"
-            />
+        <service android:name=".MainService" />
     </application>
 
 </manifest>

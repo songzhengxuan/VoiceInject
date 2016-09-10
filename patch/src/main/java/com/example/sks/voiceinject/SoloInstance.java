@@ -6,6 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -25,10 +28,12 @@ import java.util.List;
  */
 public class SoloInstance {
     static final String TAG = "SoloInstance";
+    private static Uri VOICE_SERVICE_URI = Uri.parse("content://com.example.sks.voiceinject.provider");
     private static Solo solo;
     private static Context appContext;
     private static SoloInstance sInstance;
     private ScriptEngine mScriptEngine;
+    private Context mContext;
     private IService mVoiceService;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -91,7 +96,13 @@ public class SoloInstance {
         appContext = context.getApplicationContext();
         IntentFilter filter = new IntentFilter("com.song.test");
         appContext.registerReceiver(sInstance.receiver, filter);
-        sInstance.mScriptEngine = new ScriptEngine(solo);
+        sInstance.init(appContext, solo);
+    }
+
+    private void init(Context appContext, Solo solo) {
+        mContext = appContext;
+        mScriptEngine = new ScriptEngine(solo);
+        connectToVoiceService();
     }
 
     public static Solo getSolo() {
@@ -112,5 +123,25 @@ public class SoloInstance {
             IOUtil.closeQuietly(fin);
         }
         return null;
+    }
+
+    private void connectToVoiceService() {
+        try {
+            Bundle result = mContext.getContentResolver().call(VOICE_SERVICE_URI, "getService", "voice", null);
+            if (result == null) {
+                Log.e(TAG, "Failed to getVoiceService(null call result). Need install voiceservice first");
+                return;
+            }
+
+            IBinder binder = result.getBinder("result");
+            if (binder == null) {
+                Log.e(TAG, "Failed to get voiceservice binder from result bundle");
+            } else {
+                mVoiceService = IService.Stub.asInterface(binder);
+                Log.d(TAG, "connectToVoiceService succeed with result binder " + mVoiceService.asBinder());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

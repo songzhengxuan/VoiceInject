@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 /**
  * Created by sks on 2016/9/9.
+ * 测试阶段，主要用于保活
  */
 public class MainService extends Service {
     @Nullable
