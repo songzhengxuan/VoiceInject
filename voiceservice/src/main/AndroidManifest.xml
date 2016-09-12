@@ -18,6 +18,7 @@
         </activity>
         <provider
             android:authorities="com.example.sks.voiceinject.provider"
+            android:exported="true"
             android:name="com.example.sks.voiceservice.ServiceProvider">
         </provider>
         <service android:name=".MainService" />

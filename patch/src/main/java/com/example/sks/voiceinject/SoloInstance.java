@@ -133,7 +133,7 @@ public class SoloInstance {
                 return;
             }
 
-            IBinder binder = result.getBinder("result");
+            IBinder binder = result.getBinder("binder");
             if (binder == null) {
                 Log.e(TAG, "Failed to get voiceservice binder from result bundle");
             } else {
