@@ -68,8 +68,9 @@ public class ScriptEngine {
      * {
      *  "method":"methodName",
      *  "params":"String, String, Integer"
-     *  "Para1":value
-     *  "Para2":value
+     *  "param0": StringValue0
+     *  "param1": StringValue1
+     *  "param2": IntegerValue
      * }
      * @param cmdJson
      * @return

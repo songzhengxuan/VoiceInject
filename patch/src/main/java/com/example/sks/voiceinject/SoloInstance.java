@@ -8,7 +8,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +40,23 @@ public class SoloInstance {
     private ScriptEngine mScriptEngine;
     private Context mContext;
     private IService mVoiceService;
+    private HandlerThread mWorkerThread;
+    private H mH;
+    private IClient.Stub mClientImpl = new IClient.Stub() {
+
+        @Override
+        public String handleCmd(String cmd) throws RemoteException {
+            Log.d(TAG, "receive handleCmd from voiceservice with cmd " + cmd);
+            return doHandleCmd(cmd);
+        }
+    };
+
+    private String doHandleCmd(String cmd) {
+        Message msg = mH.obtainMessage(H.MSG_HANDLE_CMD, cmd);
+        mH.sendMessage(msg);
+        return "succeed";
+    }
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -103,6 +125,13 @@ public class SoloInstance {
         mContext = appContext;
         mScriptEngine = new ScriptEngine(solo);
         connectToVoiceService();
+        startWorkerThread();
+    }
+
+    private void startWorkerThread() {
+        mWorkerThread = new HandlerThread("vj_worker");
+        mWorkerThread.start();
+        mH = new H(mWorkerThread.getLooper());
     }
 
     public static Solo getSolo() {
@@ -138,10 +167,26 @@ public class SoloInstance {
                 Log.e(TAG, "Failed to get voiceservice binder from result bundle");
             } else {
                 mVoiceService = IService.Stub.asInterface(binder);
+                mVoiceService.registerClient(mClientImpl);
                 Log.d(TAG, "connectToVoiceService succeed with result binder " + mVoiceService.asBinder());
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private class H extends Handler {
+        static final int MSG_HANDLE_CMD = 0;
+        public H(Looper looper) {
+            super(looper);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_HANDLE_CMD:
+                    mScriptEngine.startExecuteScript((String) msg.obj);
+                    break;
+            }
         }
     }
 }
