@@ -10,6 +10,14 @@ import android.support.annotation.Nullable;
  * 测试阶段，主要用于保活
  */
 public class MainService extends Service {
+    public static final String EXTRA_KEY_STRING_TEXT_INPUT = "voice_input";
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
